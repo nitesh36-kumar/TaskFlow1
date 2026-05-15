@@ -36,10 +36,12 @@ export const Dashboard: React.FC = () => {
   const [projects, setProjects] = useState<any[]>([]);
   const [tasks, setTasks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isMounted, setIsMounted] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
+    setIsMounted(true);
     if (!user) return;
     
     const unsubProjects = projectService.getMyProjects((data) => {
@@ -185,35 +187,37 @@ export const Dashboard: React.FC = () => {
               <p className="text-slate-400 text-sm font-medium">Daily completed tasks this week</p>
             </div>
           </div>
-          <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
-                <XAxis 
-                  dataKey="date" 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fill: '#94A3B8', fontSize: 11, fontWeight: 700 }}
-                  dy={10}
-                />
-                <YAxis 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fill: '#94A3B8', fontSize: 11, fontWeight: 700 }}
-                />
-                <Tooltip 
-                  cursor={{ fill: '#F8FAFC' }}
-                  contentStyle={{ 
-                    borderRadius: '12px', 
-                    border: '1px solid #E2E8F0', 
-                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-                    fontWeight: 'bold',
-                    fontSize: '12px'
-                  }}
-                />
-                <Bar dataKey="tasks" fill="#4F46E5" radius={[6, 6, 0, 0]} barSize={40} />
-              </BarChart>
-            </ResponsiveContainer>
+          <div className="h-[300px] w-full" style={{ minHeight: 300 }}>
+            {isMounted && (
+              <ResponsiveContainer width="100%" height="100%" debounce={50}>
+                <BarChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
+                  <XAxis 
+                    dataKey="date" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: '#94A3B8', fontSize: 11, fontWeight: 700 }}
+                    dy={10}
+                  />
+                  <YAxis 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: '#94A3B8', fontSize: 11, fontWeight: 700 }}
+                  />
+                  <Tooltip 
+                    cursor={{ fill: '#F8FAFC' }}
+                    contentStyle={{ 
+                      borderRadius: '12px', 
+                      border: '1px solid #E2E8F0', 
+                      boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                      fontWeight: 'bold',
+                      fontSize: '12px'
+                    }}
+                  />
+                  <Bar dataKey="tasks" fill="#4F46E5" radius={[6, 6, 0, 0]} barSize={40} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </Card>
 
@@ -221,25 +225,27 @@ export const Dashboard: React.FC = () => {
         <Card className="border border-slate-200 shadow-sm rounded-2xl p-6 bg-white overflow-hidden">
           <CardTitle className="text-lg font-bold text-slate-900 mb-1">Task Distribution</CardTitle>
           <p className="text-slate-400 text-sm font-medium mb-8">Status breakdown of current goals</p>
-          <div className="h-[220px] w-full relative">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={finalStatusData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={65}
-                  outerRadius={85}
-                  paddingAngle={8}
-                  dataKey="value"
-                >
-                  {finalStatusData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+          <div className="h-[220px] w-full relative" style={{ minHeight: 220 }}>
+            {isMounted && (
+              <ResponsiveContainer width="100%" height="100%" debounce={50}>
+                <PieChart>
+                  <Pie
+                    data={finalStatusData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={65}
+                    outerRadius={85}
+                    paddingAngle={8}
+                    dataKey="value"
+                  >
+                    {finalStatusData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
             <div className="absolute inset-0 flex items-center justify-center flex-col pointer-events-none">
               <span className="text-3xl font-black text-slate-900">{completionPercentage}%</span>
               <span className="text-[10px] uppercase font-bold text-slate-400 tracking-widest text-center">Done</span>
