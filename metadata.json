@@ -1,0 +1,6 @@
+{
+  "name": "TaskFlow",
+  "description": "A full-stack project management app with authentication, task tracking, and role-based access control.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
