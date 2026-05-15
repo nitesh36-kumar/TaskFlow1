@@ -8,7 +8,7 @@ import { motion } from 'motion/react';
 import { toast } from 'sonner';
 
 export const Login: React.FC = () => {
-  const { login, user, profile, logout } = useAuth();
+  const { login, user, profile, logout, loading } = useAuth();
   const [isLoading, setIsLoading] = React.useState(false);
 
   const handleLogin = async () => {
@@ -27,13 +27,25 @@ export const Login: React.FC = () => {
         toast.error('Network error. Please check your connection.', {
           duration: 5000,
         });
+      } else if (err.code === 'auth/unauthorized-domain') {
+        toast.error('This domain is not authorized in Firebase Console. Please add ' + window.location.hostname + ' to your Authorized Domains in the Firebase Auth settings.', {
+          duration: 10000,
+        });
       } else {
-        toast.error('Failed to sign in. Please try again.');
+        toast.error('Failed to sign in: ' + (err.message || 'Please try again.'));
       }
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#F8F9FA] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+      </div>
+    );
+  }
 
   if (user && profile?.jobTitle && (profile?.status === 'Approved' || profile?.role === 'Admin' || user.email === 'nitesh.kumar@ethara.ai')) return <Navigate to="/" />;
   if (user && !profile?.jobTitle) return <Navigate to="/onboarding" />;
