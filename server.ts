@@ -1,11 +1,6 @@
 import express from "express";
 import path from "path";
-import { createServer as createViteServer } from "vite";
-import { fileURLToPath } from 'url';
 import { Resend } from 'resend';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 let resendClient: Resend | null = null;
 
@@ -23,7 +18,7 @@ function getResend() {
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = Number(process.env.PORT || 3000);
 
   app.use(express.json());
 
@@ -98,6 +93,7 @@ async function startServer() {
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
